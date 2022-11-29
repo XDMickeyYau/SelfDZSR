@@ -16,6 +16,6 @@ setuptools.setup(
     project_urls = {
         "Bug Tracker": "https://github.com/XDMickeyYau/SelfDZSR/issues"
     },
-    packages=['SelfDZSR'],
+    packages=[],
     install_requires=[],
 )
