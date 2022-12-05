@@ -13,6 +13,7 @@ from collections import OrderedDict as odict
 from copy import deepcopy
 import shutil
 import cv2
+import traceback
 
 
 if __name__ == '__main__':
@@ -101,6 +102,7 @@ if __name__ == '__main__':
 						dataset_test.imio.write(np.array(res['data_lr_ref'][0].cpu()).astype(np.uint8), save_dir)
 				except Exception as e:
 					print("[ERROR]:",e)
+					traceback.print_exc()
 			visualizer.print_psnr(load_iter, '/' , '/' , np.mean(psnr), print_psnr=False)
 			avg_psnr = '%.6f'%np.mean(psnr)
 			avg_ssim = '%.6f'%np.mean(ssim)
