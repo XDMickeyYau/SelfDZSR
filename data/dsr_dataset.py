@@ -125,7 +125,7 @@ class DSRDataset(BaseDataset):  # Nikon Camera Images
 
 		if not self.opt.full_res:
 			lr_img, hr_img, _ = self._crop_center(lr_img, hr_img, p=400)
-		lr_ref_img, hr_ref_img, crop_coord = self._crop_center(lr_img, hr_img)
+		lr_ref_img, hr_ref_img, crop_coord = self._crop_ref(lr_img, hr_img)
 
 		hr_trans = np.transpose(hr_img, (1, 2, 0))
 
