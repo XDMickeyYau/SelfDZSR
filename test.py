@@ -64,27 +64,29 @@ if __name__ == '__main__':
 
 			time_val = 0
 			for i, data in enumerate(tqdm_val):
-				torch.cuda.empty_cache()
-				model.set_input(data)
-				torch.cuda.synchronize()
-				time_val_start = time.time()
-				model.test()
-				torch.cuda.synchronize()
-				time_val += time.time() - time_val_start
-				res = model.get_current_visuals()
+				try:
+					torch.cuda.empty_cache()
+					model.set_input(data)
+					torch.cuda.synchronize()
+					time_val_start = time.time()
+					model.test()
+					torch.cuda.synchronize()
+					time_val += time.time() - time_val_start
+					res = model.get_current_visuals()
 
-				if opt.calc_psnr:
-					psnr[i] = calc_psnr(res['data_sr'], res['data_hr'])
+					if opt.calc_psnr:
+						psnr[i] = calc_psnr(res['data_sr'], res['data_hr'])
 
-				if opt.save_imgs:
-					if opt.full_res:
-						folder_dir = './ckpt/%s/sr_full_%s' % (opt.name, opt.load_iter)  
-					else:
-						folder_dir = './ckpt/%s/sr_patch_%s' % (opt.name, opt.load_iter)  
-					os.makedirs(folder_dir, exist_ok=True)
-					save_dir = '%s/%s' % (folder_dir, data['fname'][0])
-					dataset_test.imio.write(np.array(res['data_sr'][0].cpu()).astype(np.uint8), save_dir)
-
+					if opt.save_imgs:
+						if opt.full_res:
+							folder_dir = './ckpt/%s/sr_full_%s' % (opt.name, opt.load_iter)  
+						else:
+							folder_dir = './ckpt/%s/sr_patch_%s' % (opt.name, opt.load_iter)  
+						os.makedirs(folder_dir, exist_ok=True)
+						save_dir = '%s/%s' % (folder_dir, data['fname'][0])
+						dataset_test.imio.write(np.array(res['data_sr'][0].cpu()).astype(np.uint8), save_dir)
+				except Exception as e:
+					print("[ERROR]:",e)
 			visualizer.print_psnr(load_iter, '/' , '/' , np.mean(psnr), print_psnr=False)
 			avg_psnr = '%.6f'%np.mean(psnr)
 			avg_ssim = '%.6f'%np.mean(ssim)

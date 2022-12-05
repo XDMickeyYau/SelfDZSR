@@ -143,27 +143,30 @@ if __name__ == '__main__':
 			ori_metrics = np.zeros([len(names), 9])
 			i = 0
 			for name in tqdm(names): 
-				if args.full_res:
-					pre_out = cv2.imread(file + 'sr_full_' + args.load_iter + '/' + name)[..., ::-1]
-				else:
-					pre_out = cv2.imread(file + 'sr_patch_' + args.load_iter + '/' + name)[..., ::-1]
-					# pre_out = cv2.imread(file + 'sr_full_400/' + name)[..., ::-1]
-				out = pre_out
+				try:
+					if args.full_res:
+						pre_out = cv2.imread(file + 'sr_full_' + args.load_iter + '/' + name)[..., ::-1]
+					else:
+						pre_out = cv2.imread(file + 'sr_patch_' + args.load_iter + '/' + name)[..., ::-1]
+						# pre_out = cv2.imread(file + 'sr_full_400/' + name)[..., ::-1]
+					out = pre_out
 
-				pre_ref = cv2.imread(ori_target + name)[..., ::-1]
-				ref = pre_ref
+					pre_ref = cv2.imread(ori_target + name)[..., ::-1]
+					ref = pre_ref
 
-				ori_metrics[i] = calc_metrics(out, ref, s)
-				f.write('name: %s, \n corner_psnr: %.2f, \t center_psnr: %.2f, \t total_psnr: %.2f, \
-									\n corner_SSIM: %.4f, \t center_SSIM: %.4f, \t total_SSIM: %.4f, \
-									\n corner_LPIPS: %.3f, \t center_LPIPS: %.3f, \t total_LPIPS: %.3f \t \n' \
-							% (name, ori_metrics[i][0], ori_metrics[i][1], ori_metrics[i][2], ori_metrics[i][3], ori_metrics[i][4], 
-							ori_metrics[i][5], ori_metrics[i][6], ori_metrics[i][7], ori_metrics[i][8]))
-				print('name: %s, \n corner_psnr: %.2f, \t center_psnr: %.2f, \t total_psnr: %.2f, \
-									\n corner_SSIM: %.4f, \t center_SSIM: %.4f, \t total_SSIM: %.4f, \
-									\n corner_LPIPS: %.3f, \t center_LPIPS: %.3f, \t total_LPIPS: %.3f \t \n' \
-							% (name, ori_metrics[i][0], ori_metrics[i][1], ori_metrics[i][2], ori_metrics[i][3], ori_metrics[i][4], 
-							ori_metrics[i][5], ori_metrics[i][6], ori_metrics[i][7], ori_metrics[i][8]))
+					ori_metrics[i] = calc_metrics(out, ref, s)
+					f.write('name: %s, \n corner_psnr: %.2f, \t center_psnr: %.2f, \t total_psnr: %.2f, \
+										\n corner_SSIM: %.4f, \t center_SSIM: %.4f, \t total_SSIM: %.4f, \
+										\n corner_LPIPS: %.3f, \t center_LPIPS: %.3f, \t total_LPIPS: %.3f \t \n' \
+								% (name, ori_metrics[i][0], ori_metrics[i][1], ori_metrics[i][2], ori_metrics[i][3], ori_metrics[i][4], 
+								ori_metrics[i][5], ori_metrics[i][6], ori_metrics[i][7], ori_metrics[i][8]))
+					print('name: %s, \n corner_psnr: %.2f, \t center_psnr: %.2f, \t total_psnr: %.2f, \
+										\n corner_SSIM: %.4f, \t center_SSIM: %.4f, \t total_SSIM: %.4f, \
+										\n corner_LPIPS: %.3f, \t center_LPIPS: %.3f, \t total_LPIPS: %.3f \t \n' \
+								% (name, ori_metrics[i][0], ori_metrics[i][1], ori_metrics[i][2], ori_metrics[i][3], ori_metrics[i][4], 
+								ori_metrics[i][5], ori_metrics[i][6], ori_metrics[i][7], ori_metrics[i][8]))
+				except Exception as e:
+					print("[ERROR]:",e)
 				i = i + 1
 			metrics_mean = np.mean(ori_metrics, axis=0)
 			f.write('\n camera: %s ======  \
