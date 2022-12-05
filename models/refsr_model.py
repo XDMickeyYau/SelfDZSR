@@ -22,7 +22,7 @@ class RefSRModel(BaseModel):
 
 		self.opt = opt
 
-		self.visual_names = ['data_lr', 'data_hr', 'data_sr'] 
+		self.visual_names = ['data_lr', 'data_hr', 'data_sr','data_lr_ref','data_hr_ref'] 
 		self.loss_names = ['RefSR_L1','RefSR_SWD','RefSR_Total','KernelGen_L1', 'KernelGen_Filter', 'KernelGen_Total']  #
 
 		self.model_names = ['RefSR', 'KernelGen']  #

@@ -85,6 +85,20 @@ if __name__ == '__main__':
 						os.makedirs(folder_dir, exist_ok=True)
 						save_dir = '%s/%s' % (folder_dir, data['fname'][0])
 						dataset_test.imio.write(np.array(res['data_sr'][0].cpu()).astype(np.uint8), save_dir)
+						if opt.full_res:
+							folder_dir = './ckpt/%s/ref_hr_%s' % (opt.name, opt.load_iter)  
+						else:
+							folder_dir = './ckpt/%s/ref_hr_%s' % (opt.name, opt.load_iter)  
+						os.makedirs(folder_dir, exist_ok=True)
+						save_dir = '%s/%s' % (folder_dir, data['fname'][0])
+						dataset_test.imio.write(np.array(res['data_hr_ref'][0].cpu()).astype(np.uint8), save_dir)
+						if opt.full_res:
+							folder_dir = './ckpt/%s/ref_lr_%s' % (opt.name, opt.load_iter)  
+						else:
+							folder_dir = './ckpt/%s/ref_lr_%s' % (opt.name, opt.load_iter)  
+						os.makedirs(folder_dir, exist_ok=True)
+						save_dir = '%s/%s' % (folder_dir, data['fname'][0])
+						dataset_test.imio.write(np.array(res['data_lr_ref'][0].cpu()).astype(np.uint8), save_dir)
 				except Exception as e:
 					print("[ERROR]:",e)
 			visualizer.print_psnr(load_iter, '/' , '/' , np.mean(psnr), print_psnr=False)
