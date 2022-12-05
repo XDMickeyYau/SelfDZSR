@@ -9,6 +9,14 @@ from util.util import *
 import torch
 from .degrade.degrade_kernel import degrade_kernel
 
+seed_mapping = {
+	0: (1,1),
+	1: (0.5,0.5),
+	2: (0.5,1.5),
+	3: (1.5,0.5),
+	4: (1.5,1.5)
+}
+
 
 class DSRDataset(BaseDataset):  # Nikon Camera Images
 	def __init__(self, opt, split='train', dataset_name='DSR'):
@@ -25,6 +33,7 @@ class DSRDataset(BaseDataset):  # Nikon Camera Images
 		self.finetune = opt.finetune
 		self.imio = imlib(self.mode, lib=opt.imlib)
 		self.patch_size = opt.patch_size # 48
+		self.random_seed = 0
 
 		self.scale = opt.scale
 		self.camera = {'canon':['IMG','Canon','0510'], 'sony':['sony'],
@@ -125,7 +134,7 @@ class DSRDataset(BaseDataset):  # Nikon Camera Images
 
 		if not self.opt.full_res:
 			lr_img, hr_img, _ = self._crop_center(lr_img, hr_img, p=400)
-		lr_ref_img, hr_ref_img, crop_coord = self._crop_ref(lr_img, hr_img)
+		lr_ref_img, hr_ref_img, crop_coord = self._crop_random(lr_img, hr_img)
 
 		hr_trans = np.transpose(hr_img, (1, 2, 0))
 
@@ -208,6 +217,24 @@ class DSRDataset(BaseDataset):  # Nikon Camera Images
 		hr_patch_h, hr_patch_w = self.scale * lr_patch_h, self.scale * lr_patch_w
 		crop_coord = [ph, ph+lr_patch_h, pw, pw+lr_patch_w]
 		crop_coord = np.array(crop_coord, dtype=np.int32)
+		return lr[..., ph:ph+lr_patch_h, pw:pw+lr_patch_w], \
+			   hr[..., hph:hph+hr_patch_h, hpw:hpw+hr_patch_w],\
+			   crop_coord
+
+	def _crop_random(self, lr, hr, fw=0.25, fh=0.25, p=0):
+		randomh, randomw = seed_mapping[self.random_seed]
+		ih, iw = lr.shape[-2:]
+		if p != 0:
+			fw = p / iw
+			fh = p / ih
+		lr_patch_h, lr_patch_w = round(ih * fh), round(iw * fw)
+		ph = int((ih // 2 - lr_patch_h // 2) * randomh)
+		pw = int((iw // 2 - lr_patch_w // 2) * randomw)
+		hph, hpw = self.scale * ph, self.scale * pw
+		hr_patch_h, hr_patch_w = self.scale * lr_patch_h, self.scale * lr_patch_w
+		crop_coord = [ph, ph+lr_patch_h, pw, pw+lr_patch_w]
+		crop_coord = np.array(crop_coord, dtype=np.int32)
+		self.random_seed = (self.random_seed+1)%5
 		return lr[..., ph:ph+lr_patch_h, pw:pw+lr_patch_w], \
 			   hr[..., hph:hph+hr_patch_h, hpw:hpw+hr_patch_w],\
 			   crop_coord
